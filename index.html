@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AC BLACK FLAG | B2 Homework</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pirate: { gold: '#d4af37', darkgold: '#997a00', wood: '#2c1e16', red: '#880000', parchment: '#f4e4bc' }
+                    },
+                    fontFamily: { title: ['Pirata One', 'cursive'], body: ['Merriweather', 'serif'], ui: ['Cinzel', 'serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            background-color: #140a05; color: #f4e4bc; 
+            overscroll-behavior-y: none; /* Prevents pull-to-refresh on mobile */
+        }
+        
+        #app-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: 
+                radial-gradient(circle at center, rgba(44, 30, 22, 0.85) 0%, rgba(10, 5, 2, 0.98) 100%),
+                url('https://images.unsplash.com/photo-1532153975070-2e9ab71f1b8e?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+        }
+
+        .glass {
+            background: rgba(25, 15, 10, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+        }
+
+        .text-glow-gold { text-shadow: 0 0 15px rgba(212, 175, 55, 0.8); }
+
+        /* Mobile Animations */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        
+        .screen { display: none; width: 100%; height: 100vh; flex-direction: column; }
+        .screen.active { display: flex; animation: slideIn 0.3s ease forwards; }
+        .screen.exit { animation: slideOut 0.3s ease forwards; }
+
+        .shake-fx { animation: shake 0.3s ease; }
+        
+        /* Touch adjustments */
+        .option-btn { 
+            transition: all 0.2s; 
+            touch-action: manipulation;
+        }
+        .option-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="font-body antialiased h-[100dvh] w-full overflow-hidden">
+
+    <div id="app-bg"></div>
+
+    <!-- SCREEN 1: START -->
+    <div id="screen-start" class="screen active justify-center items-center p-6 text-center relative">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534062590117-6dbf8bc9cf92?q=80&w=800')] bg-cover bg-center opacity-40 z-[-1] grayscale-[0.2]"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#140a05] via-transparent to-[#140a05] z-[-1]"></div>
+        
+        <i class="fa-solid fa-skull-crossbones text-6xl text-pirate-gold mb-6 text-glow-gold animate-pulse"></i>
+        <h2 class="font-ui text-gray-300 tracking-[0.4em] mb-2 uppercase text-xs font-bold">Quartermaster's Log</h2>
+        <h1 class="font-title text-6xl text-white mb-4 leading-tight text-glow-gold">BLACK FLAG<br><span class="text-3xl text-gray-400 font-ui tracking-widest">ASSIGNMENT</span></h1>
+        
+        <div class="glass p-5 rounded-sm mb-10 w-full max-w-sm border-t-2 border-pirate-gold">
+            <p class="font-body text-lg text-gray-300">Decrypt the 15 pirate rumors to earn your Gold Reales and unlock the intel.</p>
+            <p class="font-ui text-sm text-pirate-gold mt-4 tracking-widest font-bold"><i class="fa-solid fa-scroll mr-2"></i>Passive of Reporting Verbs (B2)</p>
+        </div>
+
+        <button onclick="startHomework()" class="w-full max-w-sm bg-gradient-to-b from-yellow-700 to-pirate-darkgold text-white font-ui font-bold text-xl py-4 rounded-sm shadow-[0_0_20px_rgba(212,175,55,0.4)] active:scale-95 transition-transform border border-pirate-gold tracking-widest">
+            WEIGH ANCHOR
+        </button>
+    </div>
+
+    <!-- SCREEN 2: EXERCISES (QUIZ) -->
+    <div id="screen-quiz" class="screen">
+        <!-- Header / Progress Bar -->
+        <header class="glass p-4 flex flex-col items-center border-b border-pirate-gold/30 z-10">
+            <div class="w-full flex justify-between items-center mb-3 font-ui font-bold text-sm tracking-widest">
+                <span class="text-white" id="progress-text">RUMOR 1/15</span>
+                <span class="text-gray-400">REALES: <span id="score-text" class="text-pirate-gold text-glow-gold">0</span></span>
+            </div>
+            <div class="w-full h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-700">
+                <div id="progress-bar" class="h-full bg-pirate-gold transition-all duration-300 w-[0%]"></div>
+            </div>
+        </header>
+
+        <!-- Question Area -->
+        <main class="flex-1 flex flex-col justify-center items-center p-6 w-full max-w-md mx-auto relative">
+            <div id="feedback-icon" class="absolute top-5 text-8xl opacity-0 transition-opacity z-0"></div>
+            
+            <div class="w-full relative z-10">
+                <h3 class="font-ui text-gray-400 text-sm mb-3 uppercase tracking-widest font-bold" id="q-category">Category</h3>
+                <h2 class="font-body text-2xl md:text-3xl text-white mb-10 leading-relaxed" id="q-text">
+                    Question text goes here?
+                </h2>
+                
+                <div id="options-container" class="flex flex-col gap-4 w-full font-ui font-bold">
+                    <!-- Options injected via JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SCREEN 3: RESULT AND TRAILER -->
+    <div id="screen-end" class="screen overflow-y-auto pb-10">
+        <div class="p-6 max-w-md mx-auto w-full flex flex-col items-center pt-10">
+            <i class="fa-solid fa-anchor text-7xl text-white mb-6 text-glow-gold"></i>
+            <h1 class="font-title text-5xl text-white mb-2 text-center tracking-widest">RUMORS DECRYPTED</h1>
+            
+            <div class="glass w-full p-6 rounded-sm text-center mb-8 border-t-4 border-pirate-gold">
+                <p class="font-ui font-bold text-sm text-gray-400 mb-2 uppercase tracking-widest">TOTAL GOLD REALES</p>
+                <p class="font-title text-6xl text-pirate-gold text-glow-gold mb-2" id="final-score">15/15</p>
+                <p class="font-body text-lg text-gray-300 mt-4 italic" id="final-message">A true pirate legend!</p>
+            </div>
+
+            <!-- Trailer Section -->
+            <div class="w-full text-center mb-4 mt-4">
+                <div class="inline-block bg-white/10 text-white border border-gray-500 px-4 py-1 rounded-sm font-ui tracking-widest text-xs mb-4 uppercase font-bold">
+                    <i class="fa-solid fa-eye mr-2 text-pirate-gold"></i>Intel Unlocked
+                </div>
+                <h3 class="font-body text-lg text-gray-300 mb-4">Watch the Remake Rumors:</h3>
+            </div>
+            
+            <!-- Video Wrapper (16:9 Aspect Ratio) -->
+            <div class="w-full aspect-video rounded-sm overflow-hidden border-2 border-pirate-gold/50 shadow-[0_0_30px_rgba(212,175,55,0.3)] bg-black mb-10 relative">
+                <iframe id="trailer-video" class="absolute top-0 left-0 w-full h-full" src="" title="Assassin's Creed Black Flag Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <button onclick="location.reload()" class="w-full glass border border-gray-600 text-white font-ui font-bold text-lg py-4 rounded-sm active:bg-white/10 transition-colors tracking-widest">
+                <i class="fa-solid fa-rotate-right mr-2"></i> RETAKE EXAM
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA: 15 Exercises (Passive of Reporting Verbs B2) ---
+        const exercises = [
+            // Impersonal "It"
+            { cat: "Impersonal Subject", text: "_______ said that Blackbeard hid his treasure on this island.", options: ["It is", "He is", "There is"], answer: 0 },
+            { cat: "Impersonal Subject", text: "It is _______ that the new remake will feature improved graphics.", options: ["expect", "expected", "expecting"], answer: 1 },
+            { cat: "Impersonal Subject", text: "It is rumored _______ Ubisoft is developing the game secretly.", options: ["that", "to", "what"], answer: 0 },
+            
+            // Personal Subject + Present/Future Infinitive
+            { cat: "Personal Subject (Present/Future)", text: "The new game is expected _______ in November 2025.", options: ["launching", "to launch", "that launch"], answer: 1 },
+            { cat: "Personal Subject (Present/Future)", text: "Edward Kenway is believed _______ the greatest pirate of all time.", options: ["to be", "that is", "being"], answer: 0 },
+            { cat: "Personal Subject (Present/Future)", text: "The Spanish Galleons are known _______ heavily armed.", options: ["be", "to be", "are"], answer: 1 },
+            { cat: "Personal Subject (Present/Future)", text: "The combat system is rumored _______ a massive overhaul.", options: ["getting", "to get", "get"], answer: 1 },
+            
+            // Personal Subject + Perfect Infinitive (Past actions)
+            { cat: "Personal Subject (Past Action)", text: "The pirate is believed _______ over 100 ships before he died.", options: ["to sink", "to have sunk", "that he sank"], answer: 1 },
+            { cat: "Personal Subject (Past Action)", text: "Ubisoft is rumored _______ development on the remake in 2021.", options: ["to have started", "to start", "starting"], answer: 0 },
+            { cat: "Personal Subject (Past Action)", text: "Blackbeard is said _______ a massive treasure in North Carolina.", options: ["to hide", "hiding", "to have hidden"], answer: 2 },
+            
+            // Mixed & Syntax Checks
+            { cat: "Syntax Check", text: "The graphics _______ expected to be completely overhauled.", options: ["is", "are", "have"], answer: 1 },
+            { cat: "Syntax Check", text: "They _______ reported to be sailing towards Nassau right now.", options: ["is", "are", "was"], answer: 1 },
+            { cat: "Syntax Check", text: "The treasure map is thought _______ lost forever in the ocean.", options: ["to be", "that is", "being"], answer: 0 },
+            { cat: "Syntax Check", text: "It _______ reported that the Navy captured the pirate captain.", options: ["is", "has", "are"], answer: 0 },
+            { cat: "Syntax Check", text: "The captain is known _______ survived a terrible shipwreck years ago.", options: ["to survive", "to have survived", "surviving"], answer: 1 }
+        ];
+
+        // --- STATE ---
+        let currentIndex = 0;
+        let score = 0;
+        let isLocked = false;
+
+        // --- DOM ELEMENTS ---
+        const screenStart = document.getElementById('screen-start');
+        const screenQuiz = document.getElementById('screen-quiz');
+        const screenEnd = document.getElementById('screen-end');
+        
+        const qCategory = document.getElementById('q-category');
+        const qText = document.getElementById('q-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreText = document.getElementById('score-text');
+        const feedbackIcon = document.getElementById('feedback-icon');
+
+        // --- LOGIC ---
+        function startHomework() {
+            screenStart.classList.replace('active', 'exit');
+            setTimeout(() => {
+                screenStart.classList.remove('exit');
+                screenStart.style.display = 'none';
+                screenQuiz.classList.add('active');
+                loadQuestion();
+            }, 300);
+        }
+
+        function loadQuestion() {
+            isLocked = false;
+            feedbackIcon.style.opacity = '0';
+            
+            const q = exercises[currentIndex];
+            qCategory.innerText = q.cat;
+            
+            // Highlight the blank space with Pirate Gold
+            qText.innerHTML = q.text.replace('_______', '<span class="border-b-4 border-pirate-gold text-pirate-gold w-20 inline-block text-center relative top-1"></span>');
+            
+            // Update UI
+            progressText.innerText = `RUMOR ${currentIndex + 1}/${exercises.length}`;
+            progressBar.style.width = `${((currentIndex) / exercises.length) * 100}%`;
+            scoreText.innerText = score;
+
+            // Render Options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn glass w-full text-left p-6 rounded-sm text-lg border-2 border-transparent text-gray-200 active:bg-white/10 tracking-wider shadow-md';
+                btn.innerHTML = `<span class="text-pirate-gold mr-4">${String.fromCharCode(65 + idx)}.</span> ${opt}`;
+                btn.onclick = () => checkAnswer(btn, idx, q.answer, opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, selectedIdx, correctIdx, textStr) {
+            if (isLocked) return;
+            isLocked = true;
+
+            const isCorrect = (selectedIdx === correctIdx);
+            
+            // Fill the blank with the chosen answer
+            qText.innerHTML = qText.innerHTML.replace(/<span.*<\/span>/, `<span class="text-${isCorrect ? 'white' : 'red-500'} font-bold px-2">${textStr}</span>`);
+
+            if (isCorrect) {
+                score++;
+                scoreText.innerText = score;
+                btn.classList.add('bg-white/20', 'border-white', 'text-white');
+                btn.classList.remove('text-gray-200');
+                
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-check text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"></i>';
+            } else {
+                btn.classList.add('bg-pirate-red/40', 'border-pirate-red', 'text-white');
+                btn.classList.remove('text-gray-200');
+                optionsContainer.classList.add('shake-fx');
+                
+                // Highlight the correct answer in white
+                const correctBtn = optionsContainer.children[correctIdx];
+                correctBtn.classList.add('border-white', 'text-white');
+                
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-xmark text-pirate-red drop-shadow-[0_0_20px_rgba(136,0,0,0.8)]"></i>';
+                
+                setTimeout(() => optionsContainer.classList.remove('shake-fx'), 300);
+            }
+
+            feedbackIcon.style.opacity = '1';
+
+            // Advance to the next question
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < exercises.length) {
+                    loadQuestion();
+                } else {
+                    finishHomework();
+                }
+            }, 1800); // 1.8s delay for the student to read the completed sentence
+        }
+
+        function finishHomework() {
+            progressBar.style.width = '100%';
+            
+            screenQuiz.classList.replace('active', 'exit');
+            setTimeout(() => {
+                screenQuiz.classList.remove('exit');
+                screenQuiz.style.display = 'none';
+                screenEnd.classList.add('active');
+                
+                document.getElementById('final-score').innerText = `${score}/${exercises.length}`;
+                const msg = document.getElementById('final-message');
+                if (score === 15) {
+                    msg.innerText = "Flawless! A true pirate legend.";
+                    msg.className = "font-body text-lg text-white mt-2";
+                } else if (score >= 10) {
+                    msg.innerText = "Good job, Captain. Keep sailing.";
+                    msg.className = "font-body text-lg text-gray-300 mt-2";
+                } else {
+                    msg.innerText = "You've been sunk. Study more!";
+                    msg.className = "font-body text-lg text-pirate-red mt-2";
+                }
+
+                // Inject the video iframe only at the end
+                document.getElementById('trailer-video').src = "https://www.youtube.com/embed/c-KfuCccYdk";
+                
+            }, 300);
+        }
+    </script>
+</body>
+</html>
